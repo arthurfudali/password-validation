@@ -8,13 +8,13 @@ import java.util.List;
 @Service
 public class PasswordService {
 
-    public boolean validatePassword(String password) {
+    public boolean simpleValidatePassword(String password) {
         // regex
         String pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%]).{8,}$";
         return password.matches(pattern);
     }
 
-    public List<String> validate(String password) {
+    public List<String> validatePasswordRegex(String password) {
 
         List<String> falhas = new ArrayList<>();
 
@@ -44,5 +44,33 @@ public class PasswordService {
         }
 
         return falhas;
+    }
+
+    public List<String> validatePasswordStreams(String password) {
+        List<String> errors = new ArrayList<>();
+        String specialCharacters = "!@#$%^&*()-_=+[]{}|;:,.<>?\"";
+        boolean hasSpecial = password.chars()
+                .anyMatch(c -> specialCharacters.indexOf(c) >= 0);
+
+        if (password.chars().noneMatch(Character::isUpperCase)) {
+            errors.add("Falta letra maiúscula.");
+        }
+        if (password.chars().noneMatch(Character::isLowerCase)) {
+            errors.add("Falta letra minúscula.");
+        }
+        if (password.chars().noneMatch(Character::isDigit)) {
+            errors.add("Falta pelo menos um dígito.");
+        }
+        if (password.chars().anyMatch(Character::isWhitespace)) {
+            errors.add("Não são permitidos espaços.");
+        }
+        if (password.length() < 8) {
+            errors.add("A senha deve ter pelo menos 8 caracteres.");
+        }
+
+        if (!hasSpecial) {
+            errors.add("A senha deve ter pelo menos um caractere especial.");
+        }
+        return errors;
     }
 }
